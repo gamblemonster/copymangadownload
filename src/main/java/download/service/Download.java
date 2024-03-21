@@ -5,12 +5,15 @@ import java.io.Serializable;
 import javax.swing.JTable;
 
 import cn.hutool.core.lang.Singleton;
+import download.enums.DownloadStatus;
 import download.gui.model.DownloadTableModel;
+import download.thread.DownloadThreadPool;
 
+@SuppressWarnings("unused")
 public abstract class Download implements Runnable,Serializable {
 	private static final long serialVersionUID = 1L;
 	
-	private boolean isRun = false;
+	private DownloadStatus status = DownloadStatus.WAIT;
 
 	protected abstract boolean download();
 	
@@ -23,25 +26,34 @@ public abstract class Download implements Runnable,Serializable {
 	public abstract String getId();
 	
 	
-	public final boolean isRun() {
+	public final DownloadStatus getDownloadStatus() {
 		// TODO Auto-generated method stub
-		return isRun;
+		return status;
 	}
-
-	protected final void setRun(boolean isRun) {
-		// TODO Auto-generated method stub
-		this.isRun = isRun;
+	
+	public final void start() {
+		this.status = DownloadStatus.START;
+		DownloadThreadPool.execute(this);
+	}
+	
+	public final void pause() {
+		this.status = DownloadStatus.PAUSE;
+	}
+	
+	public final void resume() {
+		this.status = DownloadStatus.START;
+		DownloadThreadPool.execute(this);
 	}
 	
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		if (isRun()) return;
-		setRun(true);
 		if (download()) {
-			DownloadTableModel tableModel = (DownloadTableModel) Singleton.get(JTable.class).getModel();
-			tableModel.getDownloadImpls().remove(this);
+			this.status = DownloadStatus.FINISH;
+		} else {
+			if (this.status != DownloadStatus.PAUSE) {
+				this.status = DownloadStatus.FAILED;
+			}
 		}
-		setRun(false);
 	}
 }

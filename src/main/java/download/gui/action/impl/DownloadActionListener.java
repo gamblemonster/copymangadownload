@@ -33,12 +33,16 @@ public class DownloadActionListener implements ActionListener {
 			return;
 		}
 		if ("下载选中".equals(button.getText())) {
-			int select[] = table.getSelectedRows();
-			for (int i = 0; i < select.length; i++) {
-				chapters.add(tableModel.getChapters().get(select[i]));
+			for (int i = 0; i < tableModel.getRowCount(); i++) {
+				boolean b = (Boolean) tableModel.getValueAt(i, 0);
+				if (b) chapters.add(tableModel.getChapters().get(i));
 			}
 		} else {
 			chapters = tableModel.getChapters();
+		}
+		if (chapters.size() == 0) {
+			JOptionPane.showMessageDialog(table.getRootPane().getParent(), "没有任何下载项","错误",JOptionPane.ERROR_MESSAGE);
+			return ;
 		}
 		chapters.forEach(item -> {
 			new DownloadImpl(item, table.getName());

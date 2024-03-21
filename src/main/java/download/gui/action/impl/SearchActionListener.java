@@ -2,6 +2,8 @@ package download.gui.action.impl;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +19,7 @@ import download.gui.model.ComicTableModel;
 import download.service.Searchs;
 import download.service.impl.SearchsImpl;
 
-public class SearchActionListener implements ActionListener,PaginationAction {
+public class SearchActionListener implements ActionListener,PaginationAction,KeyListener {
 	private JTextField text;
 	private ComicTableModel tableModel;
 	private Callback callback;
@@ -102,6 +104,33 @@ public class SearchActionListener implements ActionListener,PaginationAction {
 		currentPage = page;
 		search();
 		callback.call();
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			if ("".equals(text.getText())) {
+				JOptionPane.showMessageDialog(text.getRootPane(), "请输入查询值");
+				return;
+			}
+			search = new SearchsImpl(text.getText());
+			currentPage = 1;
+			search();
+			callback.call();
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

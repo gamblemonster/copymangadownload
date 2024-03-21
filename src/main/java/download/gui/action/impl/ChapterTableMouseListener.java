@@ -16,9 +16,11 @@ public class ChapterTableMouseListener extends MouseAdapter {
 		// TODO Auto-generated method stub
 		if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
 			JTable table = (JTable) e.getComponent();
-			JDialog dialog = (JDialog) table.getRootPane().getParent();
-			ChapterTableModel tableModel = (ChapterTableModel) table.getModel();
-			new ImgDialog(dialog ,tableModel.getChapters().get(table.getSelectedRow()));
+			if (!"checkbox".equals(table.getColumnName(table.columnAtPoint(e.getPoint())))) {
+				JDialog dialog = (JDialog) table.getRootPane().getParent();
+				ChapterTableModel tableModel = (ChapterTableModel) table.getModel();
+				new ImgDialog(dialog ,tableModel.getChapters().get(table.getSelectedRow()));
+			}
 		}
 	}
 }

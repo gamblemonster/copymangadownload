@@ -1,6 +1,7 @@
 package download.gui;
 
 import java.awt.BorderLayout;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,12 +13,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.TableModel;
 
 import download.entity.Chapter;
 import download.entity.Comic;
 import download.gui.action.impl.ChapterTableMouseListener;
 import download.gui.action.impl.DownloadActionListener;
 import download.gui.model.ChapterTableModel;
+import download.gui.renderer.ChapterCellRenderer;
+import download.gui.renderer.TableHeaderRenderer;
 import download.service.impl.ViewChapterImpl;
 
 public class ChapterDialog extends JDialog {
@@ -51,10 +55,10 @@ public class ChapterDialog extends JDialog {
 		mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 		add(mainPanel);
 		
-		chapterTableModel = new ChapterTableModel("章节");
-		table = new JTable(chapterTableModel);
-		table.setToolTipText("双击查看");
+		chapterTableModel = new ChapterTableModel("checkbox","章节");
+		table = new ChapterTable(chapterTableModel);
 		table.setName(comic.getName());
+		
 		scrollPane= new JScrollPane();
 		scrollPane.setViewportView(table);
 		mainPanel.add(scrollPane,BorderLayout.CENTER);
@@ -89,4 +93,29 @@ public class ChapterDialog extends JDialog {
 		table.updateUI();
 	}
 	
+}
+
+class ChapterTable extends JTable {
+	private static final long serialVersionUID = 1L;
+	
+	public ChapterTable(TableModel tableModel) {
+		// TODO Auto-generated constructor stub
+		super(tableModel);
+		ChapterCellRenderer chapterCellRenderer = new ChapterCellRenderer(this);
+		this.getColumnModel().getColumn(0).setCellRenderer(chapterCellRenderer);
+		this.getColumnModel().getColumn(0).setCellEditor(chapterCellRenderer);
+		this.getColumnModel().getColumn(0).setMaxWidth(24);
+		this.getColumnModel().getColumn(0).setMinWidth(24);
+		this.getTableHeader().setDefaultRenderer(new TableHeaderRenderer(this));
+	}
+
+	@Override
+	public String getToolTipText(MouseEvent e) {
+		int col=this.columnAtPoint(e.getPoint());
+		String tiptextString=null;
+		if(!"checkbox".equals(this.getColumnName(col))){
+			tiptextString = "双击查看";
+		}
+		return tiptextString;
+	}
 }

@@ -74,6 +74,7 @@ public class MainPane extends JPanel {
 		});
 		serachButton.addActionListener(searchActionListener);
 		pagination.setActionListener(searchActionListener);
+		searchField.addKeyListener(searchActionListener);
 		comicTable.addMouseListener(new ComicTableMouseListener());
 	}
 }

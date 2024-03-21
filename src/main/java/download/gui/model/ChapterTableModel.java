@@ -12,11 +12,13 @@ public class ChapterTableModel extends AbstractTableModel {
 	
 	private String[] titles;
 	private List<Chapter> chapters;
+	private boolean[] selected; // 状态不写到Chapter类里，防止实体类定义混乱
 	
 	public ChapterTableModel(String... titles) {
 		// TODO Auto-generated constructor stub
 		this.titles = titles;
 		this.chapters= new ArrayList<>();
+		this.selected = new boolean[chapters.size()];
 	}
 
 	@Override
@@ -34,7 +36,7 @@ public class ChapterTableModel extends AbstractTableModel {
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		// TODO Auto-generated method stub
-		return chapters.get(rowIndex).getName();
+		return columnIndex == 0?selected[rowIndex]:chapters.get(rowIndex).getName();
 	}
 	
 	@Override
@@ -43,12 +45,27 @@ public class ChapterTableModel extends AbstractTableModel {
 		return titles[column];
 	}
 	
+	@Override
+	public boolean isCellEditable(int rowIndex, int columnIndex) {
+		// TODO Auto-generated method stub
+		return columnIndex == 0;
+	}
+	
+	@Override
+	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+		// TODO Auto-generated method stub
+		if (columnIndex == 0) {
+			selected[rowIndex] = (boolean) aValue;
+		}
+	}
+	
 	public List<Chapter> getChapters() {
 		return chapters;
 	}
 	
 	public void setChapters(List<Chapter> chapters) {
 		this.chapters = chapters;
+		this.selected = new boolean[chapters.size()];
 	}
 
 }

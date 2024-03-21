@@ -1,20 +1,25 @@
 package download.service.impl;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Singleton;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import download.entity.Chapter;
 import download.entity.DownloadEntity;
+import download.enums.DownloadStatus;
 import download.gui.model.DownloadTableModel;
 import download.service.Download;
-import download.thread.ThreadPool;
 
 public class DownloadImpl extends Download {
 	private static final long serialVersionUID = 1L;
@@ -30,15 +35,14 @@ public class DownloadImpl extends Download {
 		this.comicName = comicName;
 		downloadEntities = new ArrayList<>();
 		pathFormatter = Singleton.get(JFileChooser.class).getSelectedFile().getAbsolutePath() + "/{}/{}/{}";
-		start();
+		updateTable();
 	}
 	
-	private void start() {
+	private void updateTable() {
 		DownloadTableModel tableModel = (DownloadTableModel) Singleton.get(JTable.class).getModel();
 		if (tableModel.getDownloadImpls().stream().filter(item -> item.getId()==chapter.getId()).count() == 0) {
 			tableModel.getDownloadImpls().add(this);
 			Singleton.get(JTable.class).updateUI();
-			ThreadPool.execute(this);
 		}
 	}
 
@@ -61,20 +65,38 @@ public class DownloadImpl extends Download {
 			if (downloadEntities.get(i).isSuccess()) {
 				continue;
 			}
+			if (getDownloadStatus() != DownloadStatus.START) { // 其实在下面写这个是一样的，这里写可以少建文件和省网络请求
+				success = false;
+				break;
+			}
+			InputStream inputStream = null;
+			BufferedInputStream bufferedInputStream = null;
+			FileOutputStream outputStream = null;
 			try {
-				HttpUtil.downloadFile(downloadEntities.get(i).getUrl(), 
-						new File(StrUtil.format(pathFormatter, comicName, chapter.getName(), i + ".jpg")),
-						60000);
-				downloadEntities.get(i).setSuccess(true);
-				Singleton.get(JTable.class).updateUI();
+				inputStream = HttpUtil.createGet(downloadEntities.get(i).getUrl()).timeout(30000).executeAsync().bodyStream();
+				bufferedInputStream = new BufferedInputStream(inputStream);
+				outputStream = new FileOutputStream(FileUtil.touch(new File(StrUtil.format(pathFormatter, comicName, chapter.getName(), i + ".jpg"))));
+				byte[] buffer = new byte[2 * 1024];
+				int length = 0;
+				while ((length=bufferedInputStream.read(buffer)) > 0 && getDownloadStatus() == DownloadStatus.START) {
+					outputStream.write(buffer, 0, length);
+				}
+				if (getDownloadStatus() == DownloadStatus.START) {
+					downloadEntities.get(i).setSuccess(true);
+				}
 			} catch (Exception e) {
 				// TODO: handle exception
 				downloadEntities.get(i).setSuccess(false);
 				success = false;
+			} finally {
+				IoUtil.close(outputStream);
+				IoUtil.close(bufferedInputStream);
+				IoUtil.close(inputStream);
 			}
+			Singleton.get(JTable.class).updateUI();
 		}
 		
-		return success;
+		return getDownloadStatus() == DownloadStatus.START?success:false;
 	}
 
 	@Override

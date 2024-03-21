@@ -7,17 +7,14 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Singleton;
-import download.gui.action.impl.DownloadTableMouseListener;
-import download.gui.action.impl.RetryActionListener;
 import download.gui.model.DownloadTableModel;
+import download.gui.renderer.DownloadControlCellRenderer;
 
 public class DownloadProgressPane extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -29,9 +26,6 @@ public class DownloadProgressPane extends JPanel {
 	private JTextField textField;
 	private JButton fileButton;
 	private JFileChooser fileChooser;
-	
-	private JPopupMenu popupMenu;
-	private JMenuItem retry;
 	
 	public DownloadProgressPane() {
 		// TODO Auto-generated constructor stub
@@ -61,15 +55,14 @@ public class DownloadProgressPane extends JPanel {
 		
 		add(headPanel, BorderLayout.NORTH);
 		
-		popupMenu = new JPopupMenu();
-		retry = new JMenuItem("重试");
-		
-		popupMenu.add(retry);
-		retry.addActionListener(new RetryActionListener());
-		
-		DownloadTableModel tableModel = new DownloadTableModel("名称","进度");
+		DownloadTableModel tableModel = new DownloadTableModel("","名称","进度");
 		table = new JTable(tableModel);
-		table.addMouseListener(new DownloadTableMouseListener(popupMenu));
+		DownloadControlCellRenderer cellRenderer = new DownloadControlCellRenderer(table);
+		table.getColumnModel().getColumn(0).setCellEditor(cellRenderer);
+		table.getColumnModel().getColumn(0).setCellRenderer(cellRenderer);
+		table.getTableHeader().setReorderingAllowed(false);
+		table.getColumnModel().getColumn(0).setMaxWidth(40);
+		table.getColumnModel().getColumn(0).setMinWidth(40);
 		Singleton.put(table);
 		
 		tablePanel = new JScrollPane(table);
