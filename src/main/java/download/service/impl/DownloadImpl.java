@@ -40,10 +40,7 @@ public class DownloadImpl extends Download {
 	
 	private void updateTable() {
 		DownloadTableModel tableModel = (DownloadTableModel) Singleton.get(JTable.class).getModel();
-		if (tableModel.getDownloadImpls().stream().filter(item -> item.getId()==chapter.getId()).count() == 0) {
-			tableModel.getDownloadImpls().add(this);
-			Singleton.get(JTable.class).updateUI();
-		}
+		tableModel.add(this);
 	}
 
 	@Override
@@ -93,7 +90,7 @@ public class DownloadImpl extends Download {
 				IoUtil.close(bufferedInputStream);
 				IoUtil.close(inputStream);
 			}
-			Singleton.get(JTable.class).updateUI();
+			if (null != progress) progress.progress(getTotal(), getProgress());
 		}
 		
 		return getDownloadStatus() == DownloadStatus.START?success:false;

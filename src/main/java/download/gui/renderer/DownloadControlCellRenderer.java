@@ -91,6 +91,7 @@ public class DownloadControlCellRenderer extends AbstractCellEditor implements T
 			break;
 		case FAILED:
 			renderButton.setIcon(retryIcon);
+			break;
 		default:
 			component = finishLabel;
 			break;
@@ -101,7 +102,7 @@ public class DownloadControlCellRenderer extends AbstractCellEditor implements T
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		DownloadStatus status = (DownloadStatus) table.getValueAt(table.getSelectedRow(), 0);
+		DownloadStatus status = (DownloadStatus) table.getValueAt(table.getEditingRow(), 0);
 		switch (status) {
 		case WAIT:
 		case PAUSE:
