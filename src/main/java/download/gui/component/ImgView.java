@@ -1,4 +1,4 @@
-package download.gui;
+package download.gui.component;
 
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
@@ -22,6 +22,8 @@ public class ImgView extends JPanel implements MouseMotionListener,MouseWheelLis
 	
 	private int mouseStartX,mouseStartY,mouseMoveX,mouseMoveY;
 	
+	private int fontSize = 12;
+	
 	private boolean setting;
 	
 	public ImgView() {
@@ -35,13 +37,15 @@ public class ImgView extends JPanel implements MouseMotionListener,MouseWheelLis
 	protected void paintComponent(Graphics g) {
 		// TODO Auto-generated method stub
 		super.paintComponent(g);
+		this.fontSize = g.getFont().getSize();
 		if (null != image) {
 			if (!setting) {
 				initImageInfo();
 			}
 			g.drawImage(image, startX + mouseMoveX, startY + mouseMoveY, imageWidth, imageHeight, null);
 		} else {
-			g.drawString("此页加载失败，翻页或重新打开可尝试再次加载", 10, getHeight() / 2);
+			String errorString = "此页加载失败，翻页或重新打开可尝试再次加载";
+			g.drawString(errorString, getWidth() / 2 - errorString.length()*this.fontSize / 2, getHeight() / 2);
 		}
 	}
 	

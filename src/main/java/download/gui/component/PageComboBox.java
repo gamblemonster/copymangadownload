@@ -1,4 +1,4 @@
-package download.gui;
+package download.gui.component;
 
 import javax.swing.JComboBox;
 

@@ -13,6 +13,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import download.entity.Chapter;
@@ -97,16 +99,33 @@ public class ChapterDialog extends JDialog {
 
 class ChapterTable extends JTable {
 	private static final long serialVersionUID = 1L;
+	private ChapterCellRenderer chapterCellRenderer;
 	
 	public ChapterTable(TableModel tableModel) {
 		// TODO Auto-generated constructor stub
 		super(tableModel);
-		ChapterCellRenderer chapterCellRenderer = new ChapterCellRenderer(this);
-		this.getColumnModel().getColumn(0).setCellRenderer(chapterCellRenderer);
-		this.getColumnModel().getColumn(0).setCellEditor(chapterCellRenderer);
+		chapterCellRenderer = new ChapterCellRenderer(this);
 		this.getColumnModel().getColumn(0).setMaxWidth(24);
 		this.getColumnModel().getColumn(0).setMinWidth(24);
 		this.getTableHeader().setDefaultRenderer(new TableHeaderRenderer(this));
+	}
+	
+	@Override
+	public TableCellEditor getCellEditor(int row, int column) {
+		// TODO Auto-generated method stub
+		if (column == 0) {
+			return chapterCellRenderer;
+		}
+		return super.getCellEditor(row, column);
+	}
+	
+	@Override
+	public TableCellRenderer getCellRenderer(int row, int column) {
+		// TODO Auto-generated method stub
+		if (column == 0) {
+			return chapterCellRenderer;
+		}
+		return super.getCellRenderer(row, column);
 	}
 
 	@Override

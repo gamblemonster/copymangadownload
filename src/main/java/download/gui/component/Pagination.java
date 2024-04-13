@@ -1,4 +1,4 @@
-package download.gui;
+package download.gui.component;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;

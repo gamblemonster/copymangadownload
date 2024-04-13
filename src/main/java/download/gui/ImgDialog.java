@@ -20,6 +20,8 @@ import cn.hutool.core.io.StreamProgress;
 import cn.hutool.http.HttpUtil;
 import download.entity.Chapter;
 import download.gui.action.PaginationAction;
+import download.gui.component.ImgView;
+import download.gui.component.Pagination;
 import download.service.impl.ImgSrcImpl;
 
 public class ImgDialog extends JDialog implements PaginationAction{

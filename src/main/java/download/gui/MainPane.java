@@ -8,11 +8,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToolTip;
 import javax.swing.ListSelectionModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 
+import cn.hutool.core.lang.Singleton;
 import download.gui.action.impl.ComicTableMouseListener;
 import download.gui.action.impl.SearchActionListener;
+import download.gui.component.ImageToolTip;
+import download.gui.component.Pagination;
 import download.gui.model.ComicTableModel;
+import download.gui.renderer.ComicCellRenderer;
 
 public class MainPane extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -49,7 +56,7 @@ public class MainPane extends JPanel {
 
 		tablePanel = new JScrollPane();
 		comicTableModel = new ComicTableModel("名称","作者");
-		comicTable = new JTable(comicTableModel);
+		comicTable = new ComicTable(comicTableModel);
 		comicTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		comicTable.setToolTipText("双击查看详情");
 	}
@@ -77,4 +84,30 @@ public class MainPane extends JPanel {
 		searchField.addKeyListener(searchActionListener);
 		comicTable.addMouseListener(new ComicTableMouseListener());
 	}
+}
+
+class ComicTable extends JTable {
+	private static final long serialVersionUID = 1L;
+	
+	private ComicCellRenderer comicCellRenderer;
+	
+	public ComicTable(TableModel tableModel) {
+		// TODO Auto-generated constructor stub
+		super(tableModel);
+		comicCellRenderer = new ComicCellRenderer();
+	}
+	
+	@Override
+	public TableCellRenderer getCellRenderer(int row, int column) {
+		// TODO Auto-generated method stub
+		return comicCellRenderer;
+	}
+	
+	@Override
+	public JToolTip createToolTip() {
+		// TODO Auto-generated method stub
+		return Singleton.get(ImageToolTip.class);
+	}
+	
+	
 }
