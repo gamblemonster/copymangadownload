@@ -13,7 +13,6 @@ import javax.imageio.ImageIO;
 import javax.swing.JToolTip;
 
 import cn.hutool.cache.impl.FIFOCache;
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.http.HttpUtil;
 
@@ -25,22 +24,23 @@ public class ImageToolTip extends JToolTip {
 	private int fontSize = 12;
 	
 	private FIFOCache<String, ImageReadTask> imageCache;
-	private short maxCacheSize = 50;
+	private short maxCacheSize = 100;
 	
 	public ImageToolTip() {
 		// TODO Auto-generated constructor stub
 		maxHeight = new BigDecimal(Toolkit.getDefaultToolkit().getScreenSize().getHeight() * 0.3).intValue();
 		maxWidth = maxHeight/4*3; // 封面默认4:3
 		setPreferredSize(new Dimension(maxWidth, maxHeight));
-		imageCache = new FIFOCache<>(maxCacheSize, DateUnit.MINUTE.getMillis());
+		imageCache = new FIFOCache<>(maxCacheSize);
 	}
 	
 	@Override
 	protected void paintComponent(Graphics g) {
 		// TODO Auto-generated method stub
 		this.fontSize = g.getFont().getSize();
+		String errString = "封面加载中";
 		if (null == getTipText()) {
-			String errString = "未找到封面";
+			errString = "未找到封面";
 			g.drawString(errString, getWidth()/2 + fontSize*errString.length()/2, getHeight()/2 + fontSize/2);
 			return;
 		}
@@ -60,6 +60,7 @@ public class ImageToolTip extends JToolTip {
 		} else if (readTask.isFinish()) {
 			this.image = readTask.getImage();
 		} else if (readTask.isError()) {
+			errString = "加载失败，重新尝试中";
 			ThreadUtil.execute(readTask);
 			this.image = null;
 		} else {
@@ -71,8 +72,7 @@ public class ImageToolTip extends JToolTip {
 			g.setColor(getBackground());
 			g.fillRect(0, 0, getWidth(), getHeight());
 			g.setColor(defaultColor);
-			String string = "封面加载中";
-			g.drawString(string, getWidth()/2 - fontSize*string.length()/2, getHeight()/2 + fontSize/2);
+			g.drawString(errString, getWidth()/2 - fontSize*errString.length()/2, getHeight()/2 + fontSize/2);
 		} else {
 			g.drawImage(image, 0, 0, getWidth(), getHeight(), this);
 		}
@@ -117,11 +117,11 @@ class ImageReadTask implements Runnable {
 		try {
 			this.image = ImageIO.read(HttpUtil.createGet(url).timeout(5000).execute().bodyStream());
 			this.finish = true;
-			callback.accept(this);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			this.error = true;
 		}
+		callback.accept(this);
 	}
 	
 }

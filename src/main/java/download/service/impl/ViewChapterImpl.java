@@ -27,7 +27,7 @@ public class ViewChapterImpl implements ViewChapter {
 	@Override
 	public List<Chapter> getChapterList() {
 		// TODO Auto-generated method stub
-		String jsonString = HttpUtil.get(StrUtil.format(API.CHAPTER_URL, API.MAIN_URL,path_word));
+		String jsonString = HttpUtil.get(StrUtil.format(API.CHAPTER_URL, path_word));
 		String string = JSONObject.parseObject(jsonString).getString("results");
 		AES aes = new AES(Mode.CBC,Padding.PKCS5Padding,API.PASSWORD.getBytes(CharsetUtil.CHARSET_UTF_8),string.substring(0, 16).getBytes(CharsetUtil.CHARSET_UTF_8));
 		JSONArray list = JSONObject.parseObject(aes.decryptStr(string.substring(16), CharsetUtil.CHARSET_UTF_8))

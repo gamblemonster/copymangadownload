@@ -29,7 +29,7 @@ public class ImgSrcImpl implements ImgSrc {
 	@Override
 	public List<String> getUrlsList() {
 		// TODO Auto-generated method stub
-		String string = HttpUtil.get(StrUtil.format(API.IMG_LIST_URL, API.MAIN_URL,path_word,id));
+		String string = HttpUtil.get(StrUtil.format(API.IMG_LIST_URL, path_word,id));
 		String cipher = ReUtil.get("<div class=\"imageData\" contentKey=\"(.*?)\">", string, 1);
 		AES aes = new AES(Mode.CBC,Padding.PKCS5Padding,API.PASSWORD.getBytes(CharsetUtil.CHARSET_UTF_8),cipher.substring(0, 16).getBytes(CharsetUtil.CHARSET_UTF_8));
 		JSONArray array = JSONArray.parseArray(aes.decryptStr(cipher.substring(16), CharsetUtil.CHARSET_UTF_8));

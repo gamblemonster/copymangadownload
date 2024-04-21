@@ -24,7 +24,7 @@ public class SearchsImpl implements Searchs {
 
 	public List<Comic> getComicList(Integer page, Integer rows) {
 		// TODO Auto-generated method stub
-		String string = HttpUtil.get(StrUtil.format(API.SEARCH_URL, API.MAIN_URL,searchKey,(page-1)*rows,rows));
+		String string = HttpUtil.get(StrUtil.format(API.SEARCH_URL, searchKey, (page-1)*rows, rows));
 		JSONObject results = JSONObject.parseObject(string).getJSONObject("results");
 		total = results.getIntValue("total");
 		JSONArray list = results.getJSONArray("list");
